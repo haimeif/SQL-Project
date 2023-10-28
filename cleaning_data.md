@@ -15,27 +15,24 @@ SELECT	ROUND("ProductPrice"/1000000, 2) AS "ProductPrice"
 FROM	all_sessions;
 ```
 
-```
 -- Then I used UPDATE statement to change the dataset as following.
-
+```
 UPDATE all_sessions
 	SET "ProductPrice" = ROUND("ProductPrice"/1000000, 2)
 ```
 
 2. When working on the questions that uses the “Country” and “City” columns in the all_sessions table, I found that although there is no null values in these columns, but there are inconsistent values like '(not set)' and 'not available in demo dataset'. In order to make the values less inconsistent, I tried to replace the inconsistent values of the “City” column with the valid values in the “Country” column. That means when Country is ‘Canada’ and City id ‘(not set)’, the ‘(not set)’ will be replaced by ‘Canada’. In this way, the replaced values can be treated as one special city in that country. But for the rows that both values are ‘(not set)’ will remain unchanged because there is not enough information to determine what the values should be.
 
-```
 -- Same in here, before I use the UPDATE statement, I first used the SELECT statement with CASE WHEN clause to check if the query returns what it is expected.
-
+```
 SELECT	“Country”, 
 	CASE WHEN "City" NOT IN ('(not set)', 'not available in demo dataset') THEN "City" 
 	WHEN "City" IN ('(not set)', 'not available in demo dataset') THEN "Country" END AS “City”
 FROM	all_sessions
 ```
 
-```
 -- Then I used UPDATE statement to change the dataset as following.
-
+```
 UPDATE all_sessions
 	SET "City" = CASE WHEN "City" NOT IN ('(not set)', 'not available in demo dataset') THEN 	"City" 
 	WHEN "City" IN ('(not set)', 'not available in demo dataset') THEN "Country" END
@@ -45,9 +42,8 @@ Beside the ‘(not set)’ values, the “City” column has another issue, that
 
 3. I also checked if there are columns with null values in the entire column using the following query on different table names and column names.
 
-```
 -- SELECT and returns non-null values within the table, it will return an empty table if it is empty column.
-
+```
 SELECT	*
 FROM 	all_sessions
 WHERE 	"SearchKeyword" IS NOT NULL
@@ -64,16 +60,14 @@ I did not remove any if these columns for this project because they do not affec
 
 4. I also did some extra cleaning on the “Name” columns in the sales_report and products tables, even though I didn’t need to use these columns at the end. Some of “Name” values has white spaces at the beginning of the word.
 
-```
 -- Use the SELECT statement with LTRIM and RTRIM clause to try first,
-
+```
 SELECT LTRIM(RTRIM("Name"))
 FROM sales_report;
 ```
 
-```
 -- and then the UPDATE statement to remove the leading and trailing spaces.
-
+```
 UPDATE sales_report
 SET "Name" = LTRIM(RTRIM("Name"))
 ```
