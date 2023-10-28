@@ -9,9 +9,8 @@ Below, provide the SQL queries you used to clean your data.
 
 1. While exploring the dataset, I found the “ProductPrice" column from the all_sessions table is in an unreasonable scale (ex. 18,990,000) and invalid format (no decimals). In order to retrieve accurate pricing from the data, values in these columns has to be divide by 1,000,000 and round to 2 decimals place.
 
-```
 -- First I used the SELECT statement to try if the ROUND clause in below query would returns the result I expected, and it did. The “ProductPrice" is now in a reasonable scale and format (ex. 18.99).
-
+```
 SELECT	ROUND("ProductPrice"/1000000, 2) AS "ProductPrice"
 FROM	all_sessions;
 ```
