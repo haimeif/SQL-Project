@@ -8,9 +8,8 @@ Describe your QA process and include the SQL queries used to execute it.
 
 For the QA process, I first started with data profiling, which to verify if all tables, columns, and csv files has created and imported into the database successfully and correctly.
 
-```
 -- This query below returns a table with information about the tables in the database.
-
+```
 SELECT 	*
 FROM	information_schema.tables
 WHERE 	table_schema = 'public'
@@ -18,9 +17,8 @@ WHERE 	table_schema = 'public'
 
 The result shows all 5 tables are imported into the ecommerce database successfully.
 
-```
 -- This query returns a table with information about the columns created and imported into the table. It can be used to check all tables just by changing the table_name in the query.
-
+```
 SELECT	*
 FROM	information_schema.columns
 WHERE	table_schema = 'public'
@@ -39,9 +37,8 @@ QA Process - Data Validation:
 
 This query checks whether there are missing values in "Country", "City", "TotalOrdered", "ProductPrice" columns.
 
-```
 -- JOIN both tables and filter the values that is null.
-
+```
 SELECT	"Country", "City", "TotalOrdered", "ProductPrice"
 FROM	all_sessions als
 JOIN	sales_by_sku sbs USING("ProductSKU")
@@ -55,9 +52,8 @@ The result shows there are no missing values in these columns.
 
 Next, check for inconsistent values in "Country", "City" columns. When exploring the dataset, I found in these columns, it contains values like (not set)' and 'not available in demo dataset' instead of a valid country name and city name. the following query check whether it is true.
 
-```
 -- Use WHERE clause to output rows with ‘(not set)' or 'not available in demo dataset' values.
-
+```
 SELECT	"Country", "City"
 FROM	all_sessions
 WHERE	"Country" IN ('(not set)', 'not available in demo dataset')
@@ -68,9 +64,8 @@ It returns a table with "Country" and "City" columns that contains ‘(not set)'
 
 Next checking if there are invalid values (negative values) in "TotalOrdered" and "ProductPrice" columns with the query below.
 
-```
 -- First JOIN both tables to SELECT these columns from two separate tables, then use WHERE clause to output all values less than zero.
-
+```
 SELECT	"TotalOrdered", "ProductPrice"
 FROM		all_sessions als
 JOIN		sales_by_sku sbs USING("ProductSKU")
@@ -79,9 +74,8 @@ WHERE	"TotalOrdered" < 0 OR "ProductPrice" < 0
 
 The result shows no negative values in the "TotalOrdered" and "ProductPrice" columns.
 
-```
 -- Then check whether "TotalOrdered" and "ProductPrice" columns are in a valid format using the following query to output all values in these two columns.
-
+```
 SELECT	"TotalOrdered", "ProductPrice"
 FROM	all_sessions als
 JOIN	sales_by_sku sbs USING("ProductSKU")
@@ -95,9 +89,8 @@ Data Cleansing for “City” column
 
 As there are inconsistent values '(not set)' and 'not available in demo dataset' in the "City" column of the all_sessions table, they can be replace by the valid values in the "Country" column to make it less inconsistent and treated as a special city with the same name as the country.
 
-```
 -- The following query is to replace the (not set)' and 'not available in demo dataset' city name with the country name by using the UPDATE statement and CASE WHEN clause.
-
+```
 UPDATE all_sessions
 SET "City" = CASE WHEN "City" NOT IN ('(not set)', 'not available in demo dataset') THEN "City"
 	WHEN "City" IN ('(not set)', 'not available in demo dataset') THEN "Country" END
@@ -107,9 +100,8 @@ After executed the UPDATE query above, "City" rows with inconsistent values will
 
 Testing for “City” column
 
-```
 -- This query checks whether the "City" column has been updated correctly.
-
+```
 SELECT	"Country", "City"
 FROM	all_sessions
 WHERE	"City" IN ('(not set)', 'not available in demo dataset')
@@ -119,9 +111,8 @@ It returns only rows that both "City" and "Country" are '(not set)', update has 
 
 Data Cleansing for ProductPrice" column
 
-```
 -- Following query convert "ProductPrice" column to proper scale and format to 2 decimals numeric in all_sessions table, by using the UPDATE statement and ROUND clause
-
+```
 UPDATE all_sessions
 	SET "ProductPrice" = ROUND("ProductPrice"/1000000, 2)
 ```
@@ -130,9 +121,8 @@ After update, the "ProductPrice" values should be in a reasonable range with 2 d
 
 Testing for ProductPrice" column
 
-```
 -- Below query output the "ProductPrice" column and check whether it has been updated successfully.
-
+```
 SELECT	"ProductPrice"
 FROM	all_sessions
 ```
@@ -145,9 +135,8 @@ QA Process - Data Validation:
 
 This query checks whether there are missing values in "ProductSKU", "V2ProductCategory", "V2ProductName" columns in all_sessions and sales_by_sku tables.
 
-```
 -- JOIN both tables and filter the values that is null.
-
+```
 SELECT	"ProductSKU", "V2ProductCategory", "V2ProductName"
 FROM	all_sessions als
 JOIN	sales_by_sku sbs using("ProductSKU")
@@ -160,9 +149,8 @@ The result shows there are no missing values in these columns.
 
 Next, check duplicate data for sales_by_sku table.
 
-```
 -- This query COUNT each "ProductSKU" and output values that has count greater than 1 to determine if there is duplicate data.
-
+```
 SELECT		"ProductSKU", COUNT(*)
 FROM		sales_by_sku
 GROUP BY 	"ProductSKU"
@@ -173,9 +161,8 @@ An empty table returned, there is no duplicate data in sales_by_sku table.
 
 Next, check for inconsistent values in ""ProductSKU", "V2ProductCategory", "V2ProductName" columns. When exploring the dataset, I found in these columns, it contains values like (not set)' and '${escCatTitle}' instead of a valid name. the following query check whether it is true.
 
-```
 -- JOIN two tables and use WHERE clause to output rows with ‘(not set)' or '${escCatTitle}' values.
-
+```
 SELECT	"ProductSKU", "V2ProductCategory", "V2ProductName"
 FROM	all_sessions als
 JOIN	sales_report sr using("ProductSKU")
@@ -192,9 +179,8 @@ QA Process - Data Validation:
 
 The following queries run separately to checks whether there are missing values in FullVisitorId", “ChannelGrouping” and " Date" from both all_sessions and analytic tables.
 
-```
 -- FULL OUTER JOIN the two tables to include all "FullVisitorId" and output any null values in the column.
-
+```
 SELECT		"FullVisitorId"
 FROM		analytics
 FULL OUTER JOIN	all_sessions USING("FullVisitorId")
@@ -203,9 +189,8 @@ WHERE		"FullVisitorId" IS NULL
 
 There is no missing values in "FullVisitorId" column in both tables.
 
-```
 -- SELECT “ChannelGrouping” and “Date” that has null values.
-
+```
 SELECT	"ChannelGrouping", "Date"
 FROM	analytics
 WHERE	"ChannelGrouping" IS NULL
@@ -223,9 +208,8 @@ There are no missing values in "ChannelGrouping" and "Date" column in both table
 
 Check total number of distinct "FullVisitorId" in analytics and all_sessions tables. 
 
-```
 -- First get the DISTINCT "FullVisitorId" from both tables and combine using UNION ALL to include duplicate values. Then use it as subquery and COUNT the number of all "FullVisitorId".
-
+```
 SELECT	COUNT("FullVisitorId")
 FROM	
 	(SELECT		DISTINCT "FullVisitorId"
@@ -239,9 +223,8 @@ The total number of distinct "FullVisitorId" in both tables is 134,241. As a res
 
 Check the date range of the "Date" column in analytics and all_sessions tables.
 
-```
 -- SELECT the earliest and latest “Date” from both tables using MIN and MAX clause and combine them using UNION ALL.
-
+```
 SELECT	MIN("Date"), MAX("Date")
 FROM	analytics
 UNION ALL
@@ -250,4 +233,3 @@ FROM	all_sessions
 ```
 
 The date range in analytics table is between '2017-05-01' and '2017-08-01'. The date range in all_sessions table is between '2016-08-01' and '2017-08-01'. As a result, the date range in this dataset is between '2016-08-01' and '2017-08-01'. If monthly result is needed, '2017-08-01' shouldn’t be included in the calculation because it has date of only one day for the month.
-
