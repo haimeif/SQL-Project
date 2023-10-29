@@ -3,6 +3,7 @@ What are your risk areas? Identify and describe them.
 The risk areas of this dataset are the accuracy, completeness, and consistency of the data. The dataset has inaccuracy data format and values, like unit price in a very large scale, and values time columns is a long integer that unable to determine data type or format, some country and city names are mismatch or missing. There are also many missing (null) and inconsistent values (‘(not set)’).
 
 
+
 QA Process:
 Describe your QA process and include the SQL queries used to execute it.
 
